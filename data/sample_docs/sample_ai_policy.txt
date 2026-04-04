@@ -1,0 +1,16 @@
+AI Policy Overview - India and EU
+
+India's National AI Strategy (2023):
+India's approach to AI regulation focuses on innovation-first policies.
+The Ministry of Electronics and IT (MeitY) released advisory guidelines rather than binding
+legislation. Key pillars include AI for social good, responsible AI principles,
+and the India AI Mission with Rs 10,372 crore in funding announced in 2024.
+India emphasises AI in agriculture, healthcare, and education sectors.
+
+EU AI Act (2024):
+The European Union passed the world's first comprehensive AI regulation - the EU AI Act -
+in March 2024. It classifies AI systems by risk level: unacceptable risk (banned),
+high risk (strict requirements), limited risk (transparency obligations), and minimal risk.
+High-risk AI systems require conformity assessments, human oversight, and transparency.
+The Act applies to any company deploying AI in the EU market regardless of their location.
+Fines can reach 35 million euros or 7% of global annual turnover.

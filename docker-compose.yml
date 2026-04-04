@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    env_file: .env
+    volumes:
+      - ./chroma_db:/app/chroma_db
+      - ./data:/app/data
+    command: >
+      bash -c "
+        python -m app.ingestion.ingest --path ./data/sample_docs &&
+        python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+      "
+
+  web:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+    environment:
+      - NEXT_PUBLIC_API_BASE_URL=http://api:8000

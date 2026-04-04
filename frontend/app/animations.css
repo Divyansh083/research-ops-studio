@@ -1,0 +1,288 @@
+/* ============================================================================
+ * NEON NEURAL — Holographic Cyberpunk Animations
+ * ============================================================================ */
+
+/* ---- Keyframes ---- */
+
+@keyframes cyberGlitchIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.95) skewX(2deg);
+    filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0));
+  }
+  30% {
+    opacity: 0.8;
+    transform: scale(1.02) skewX(-2deg);
+    filter: drop-shadow(-5px 0 0 rgba(255, 82, 92, 0.4)) drop-shadow(5px 0 0 rgba(0, 240, 255, 0.4));
+  }
+  60% {
+    opacity: 1;
+    transform: scale(0.99) skewX(1deg);
+    filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.8));
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) skewX(0);
+    filter: drop-shadow(0 0 0px rgba(0, 240, 255, 0));
+  }
+}
+
+@keyframes holographicSlideRight {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+    clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  }
+}
+
+@keyframes holographicSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+    border-bottom: 2px solid var(--primary);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    border-bottom: 1px solid var(--ghost-border);
+  }
+}
+
+@keyframes buttonScan {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+@keyframes dataPulse {
+  0%, 100% { 
+    opacity: 1; 
+    text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+  }
+  50% { 
+    opacity: 0.6; 
+    text-shadow: 0 0 2px rgba(0, 240, 255, 0.1);
+  }
+}
+
+@keyframes neonFlicker {
+  0% { opacity: 1; }
+  1% { opacity: 0.4; }
+  2% { opacity: 1; }
+  8% { opacity: 1; }
+  9% { opacity: 0.2; }
+  10% { opacity: 1; }
+  50% { opacity: 1; }
+  51% { opacity: 0.5; }
+  52% { opacity: 1; }
+  100% { opacity: 1; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes cursorBlink {
+  0%, 100% { border-right-color: transparent; }
+  50% { border-right-color: var(--primary); }
+}
+
+/* ---- Page entrance ---- */
+
+.hero {
+  animation: cyberGlitchIn 600ms cubic-bezier(0.19, 1, 0.22, 1) both;
+}
+
+.sidebar-card {
+  animation: holographicSlideRight 500ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.sidebar-card:nth-child(1) { animation-delay: 100ms; }
+.sidebar-card:nth-child(2) { animation-delay: 200ms; }
+.sidebar-card:nth-child(3) { animation-delay: 300ms; }
+
+.composer-card {
+  animation: holographicSlideUp 500ms cubic-bezier(0.16, 1, 0.3, 1) 200ms both;
+}
+
+.metrics-grid {
+  animation: holographicSlideUp 500ms cubic-bezier(0.16, 1, 0.3, 1) 300ms both;
+}
+
+/* ---- Card hover effects ---- */
+
+.sidebar-card,
+.panel,
+.metric-card,
+.composer-card,
+.agent-card,
+.feed-card,
+.artifact-card {
+  transition: all 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.metric-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 10px 30px rgba(0, 240, 255, 0.2);
+  border-color: rgba(0, 240, 255, 0.4);
+}
+
+.metric-card:nth-child(even):hover {
+  box-shadow: 0 10px 30px rgba(255, 82, 92, 0.2);
+  border-color: rgba(255, 82, 92, 0.4);
+}
+
+.agent-card:hover,
+.feed-card:hover {
+  transform: translateX(4px);
+  border-left-color: var(--primary);
+  background: rgba(0, 240, 255, 0.05);
+}
+
+/* ---- Tab transitions ---- */
+
+.tab-button {
+  transition: all 200ms ease;
+}
+
+.tab-button.active {
+  animation: cyberGlitchIn 300ms ease-out;
+}
+
+/* ---- Notice entrance ---- */
+
+.notice {
+  animation: holographicSlideUp 400ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ---- Agent badge pulse ---- */
+
+.agent-badge {
+  animation: neonFlicker 3s infinite;
+}
+
+/* ---- List item stagger ---- */
+
+.agent-card,
+.feed-card,
+.artifact-card {
+  animation: holographicSlideUp 400ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.agent-card:nth-child(1), .feed-card:nth-child(1), .artifact-card:nth-child(1) { animation-delay: 50ms; }
+.agent-card:nth-child(2), .feed-card:nth-child(2), .artifact-card:nth-child(2) { animation-delay: 150ms; }
+.agent-card:nth-child(3), .feed-card:nth-child(3), .artifact-card:nth-child(3) { animation-delay: 250ms; }
+.agent-card:nth-child(4), .feed-card:nth-child(4), .artifact-card:nth-child(4) { animation-delay: 350ms; }
+.agent-card:nth-child(5), .feed-card:nth-child(5), .artifact-card:nth-child(5) { animation-delay: 450ms; }
+
+/* ---- Metric value animation ---- */
+
+.metric-card strong {
+  transition: color 200ms ease, text-shadow 200ms ease;
+  animation: dataPulse 4s infinite alternate;
+}
+
+/* ---- Skeleton / loading ---- */
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.02) 25%,
+    rgba(0, 240, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.02) 75%
+  );
+  background-size: 800px 100%;
+  animation: buttonScan 1.5s infinite linear;
+  border-radius: 0;
+}
+
+.skeleton-text {
+  height: 10px;
+  margin-bottom: 8px;
+  width: 100%;
+}
+
+.skeleton-line {
+  height: 14px;
+  margin-bottom: 12px;
+  width: 100%;
+}
+
+/* ---- Scanner Spinner ---- */
+
+.spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(0, 240, 255, 0.1);
+  border-top-color: var(--primary);
+  border-left-color: var(--secondary);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+}
+
+/* ---- Typing Cursor Effect ---- */
+
+.hero h1::after {
+  content: "_";
+  display: inline-block;
+  color: var(--primary);
+  opacity: 1;
+  animation: neonFlicker 2s infinite;
+}
+
+/* ---- Chip hover ---- */
+
+.chip {
+  transition: all 200ms ease;
+}
+
+.chip:hover {
+  transform: translateY(-2px) scale(1.05);
+  background: rgba(0, 240, 255, 0.15);
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+}
+
+/* ---- Code block cyber hover ---- */
+
+.code-block {
+  transition: border-color 200ms ease, box-shadow 200ms ease;
+}
+
+.code-block:hover {
+  border-color: rgba(0, 240, 255, 0.3);
+  box-shadow: inset 0 0 20px rgba(0, 240, 255, 0.05);
+}
+
+/* ---- Collapsible panels ---- */
+
+details {
+  animation: holographicSlideUp 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+details[open] > *:not(summary) {
+  animation: holographicSlideRight 400ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ---- Loading toast ---- */
+
+.loading-toast {
+  animation: cyberGlitchIn 400ms ease-out;
+}
+
+/* ---- Reduced motion ---- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

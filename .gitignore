@@ -1,0 +1,36 @@
+# Secrets
+.env
+frontend/.env.local
+
+# Python environments
+venv/
+.venv/
+
+# Python cache / test artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Sandbox / runtime state
+.code_sandbox/
+chroma_db/
+tmp/
+*.pid
+
+# Runtime datasets and uploads
+data/uploads/
+data/generated/
+data/sample_docs/*.pdf
+
+# Frontend build / dependencies
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

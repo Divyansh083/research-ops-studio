@@ -1,0 +1,18 @@
+Global AI Market Statistics 2024
+
+Market Size:
+- Global AI market valued at $184 billion in 2024
+- Expected to reach $826 billion by 2030 (CAGR ~28%)
+- Generative AI segment: $44 billion in 2023, projected $1.3 trillion by 2032
+
+Adoption by Region:
+- North America leads with 35% of global AI investment
+- Asia-Pacific growing fastest at 32% CAGR
+- Europe accounts for 18% of global AI spending
+- India AI market: $6 billion in 2023, projected $17 billion by 2027
+
+Key Technology Trends:
+- Large language models dominate R&D investment
+- Edge AI growing due to privacy and latency requirements
+- AI chips market: $53 billion in 2023
+- Open-source models gaining enterprise adoption

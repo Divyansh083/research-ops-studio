@@ -1,0 +1,1425 @@
+/* ============================================================================
+ * NEON NEURAL — Holographic Dark Mode (Crazy UI)
+ * Stitch MCP Design System: "The Kinetic Monolith"
+ * ============================================================================ */
+
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap");
+@import url("./animations.css");
+@import url("./enhancements.css");
+
+:root {
+  --primary-glow: rgba(0, 240, 255, 0.4);
+  --secondary-glow: rgba(255, 0, 242, 0.2);
+  --text-primary: #e1fdff;
+  --text-secondary: #b9cacb;
+  color-scheme: dark;
+
+  /* Surface Hierarchy — Deep Space Neurals */
+  --surface: #131318;
+  --surface-container-low: #1b1b20;
+  --surface-container: #1f1f25;
+  --surface-container-high: #2a292f;
+  --surface-container-highest: #35343a;
+  --surface-container-lowest: #0e0e13;
+
+  /* Legacy aliases mapped to Neon Neural */
+  --paper: rgba(10, 10, 15, 0.6); /* Heavy Glassmorphism */
+  --paper-strong: var(--surface-container-high);
+
+  /* Typography & Lines */
+  --ink: #e4e1e9;               /* High contrast white */
+  --on-surface: #e4e1e9;
+  --on-surface-variant: #b9cacb;
+  --muted: #849495;
+
+  /* The Neon Gases (Tokens) */
+  --primary: #00f0ff;           /* Electric Cyan */
+  --primary-container: #006970;
+  --on-primary: #002022;
+
+  --secondary: #ff525c;         /* Neon Magenta */
+  
+  --tertiary: #8523dd;          /* Glowing Violet */
+  --mint: #7df4ff;              /* Cyan variant for success */
+
+  /* Semantic */
+  --error: #ffb4ab;
+  --error-container: #93000a;
+  --success: #00f0ff;           /* Cyan mapped to success */
+  --warning: #ff525c;           /* Magenta mapped to warning */
+
+  /* Outline — "Ghost Borders" */
+  --outline: rgba(0, 240, 255, 0.4);
+  --outline-variant: rgba(132, 148, 149, 0.15);
+  --ghost-border: rgba(132, 148, 149, 0.15);
+
+  /* Ambient Glows (discarding traditional drop shadows) */
+  --glow-cyan: 0 0 48px rgba(0, 240, 255, 0.08);
+  --glow-magenta: 0 0 48px rgba(255, 82, 92, 0.08);
+  --glow-violet: 0 0 48px rgba(133, 35, 221, 0.08);
+  
+  --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 16px 32px rgba(0, 0, 0, 0.6);
+  --shadow-card: var(--glow-cyan); /* Default ambient glow */
+
+  /* Motion */
+  --transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-fast: all 140ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background-color: var(--surface);
+}
+
+body {
+  /* Holographic background depth */
+  background: 
+    radial-gradient(ellipse 80% 60% at 5% -20%, rgba(0, 240, 255, 0.08), transparent 60%),
+    radial-gradient(ellipse 60% 50% at 95% 120%, rgba(255, 82, 92, 0.06), transparent 60%),
+    var(--surface);
+  color: var(--ink);
+  font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Add global scanlines overlay */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background: linear-gradient(
+    to bottom,
+    transparent 50%,
+    rgba(0, 0, 0, 0.1) 51%
+  );
+  background-size: 100% 2px; /* Thinner scanlines for premium feel */
+  opacity: 0.1;
+}
+
+.scanline-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.03) 0px,
+    rgba(0, 0, 0, 0.03) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  z-index: 1;
+  opacity: 0.4;
+}
+
+button, input, select, textarea {
+  font: inherit;
+}
+
+/* ============================================================================
+ * SCROLLBARS — Obsidian Protocol
+ * ============================================================================ */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--surface-container-lowest);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  opacity: 0.3;
+  border-radius: 0px;
+  box-shadow: 0 0 10px var(--primary-glow);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--mint);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary) var(--surface-container-lowest);
+}
+
+a {
+  color: inherit;
+}
+
+/* ============================================================================
+ * LAYOUT — WORKSPACE SHELL
+ * ============================================================================ */
+
+.workspace-shell {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);
+  gap: 0;
+  min-height: 100vh;
+  padding: 1.5rem;
+  align-items: start;
+  position: relative;
+}
+
+.sidebar, .main-stage {
+  min-width: 0;
+}
+
+/* ============================================================================
+ * SIDEBAR — The Monolith
+ * ============================================================================ */
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1.5rem;
+  padding: 1.5rem 1.25rem;
+  background: transparent;
+  max-height: calc(100vh - 3rem);
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--outline) transparent;
+}
+
+/* ============================================================================
+ * MAIN STAGE
+ * ============================================================================ */
+
+.main-stage {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 0.5rem 0 0.5rem 2rem;
+}
+
+/* ============================================================================
+ * CARDS — Heavy Glassmorphism & Hard Edges
+ * ============================================================================ */
+
+.sidebar-card,
+.panel,
+.metric-card,
+.composer-card,
+.agent-card,
+.feed-card,
+.artifact-card,
+.empty-state,
+.loading-toast {
+  /* No rounded corners in Neon Neural */
+  border-radius: 0px !important;
+  background: var(--paper); /* Dark translucent */
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--ghost-border);
+  box-shadow: var(--shadow-sm);
+  position: relative;
+}
+
+.sidebar-card,
+.panel,
+.composer-card,
+.agent-card,
+.feed-card,
+.artifact-card,
+.empty-state {
+  padding: 1.5rem;
+}
+
+.metric-card {
+  padding: 1.25rem;
+  box-shadow: var(--glow-cyan);
+  transition: transform 0.3s var(--transition-fast), box-shadow 0.3s var(--transition-fast);
+}
+
+.metric-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 0 30px rgba(0, 240, 255, 0.15);
+}
+
+/* Add holographic corner accents to main cards */
+.sidebar-card::before,
+.composer-card::before,
+.metric-card::before {
+  content: "";
+  position: absolute;
+  top: -1px; left: -1px;
+  width: 12px; height: 12px;
+  border-top: 2px solid var(--primary);
+  border-left: 2px solid var(--primary);
+  pointer-events: none;
+}
+.sidebar-card::after,
+.composer-card::after,
+.metric-card::after {
+  content: "";
+  position: absolute;
+  bottom: -1px; right: -1px;
+  width: 12px; height: 12px;
+  border-bottom: 2px solid var(--secondary);
+  border-right: 2px solid var(--secondary);
+  pointer-events: none;
+}
+
+/* ============================================================================
+ * TYPOGRAPHY — Space Grotesk Hacking
+ * ============================================================================ */
+
+/* ============================================================================
+ * TYPOGRAPHY — Space Grotesk Hacking
+ * ============================================================================ */
+
+.sidebar-card h2,
+.composer-card h2,
+.panel h2,
+.artifact-card h3 {
+  margin: 0;
+  font-family: "Space Grotesk", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink);
+}
+
+
+.sidebar-card h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.hero-copy {
+  color: var(--on-surface-variant);
+  margin-top: 1rem;
+  font-size: 1rem;
+  max-width: 55ch;
+  font-family: "Space Grotesk", sans-serif;
+}
+
+.panel p,
+.sidebar-card p,
+.composer-card p,
+.artifact-card p,
+.feed-card p {
+  color: var(--on-surface-variant);
+}
+
+.eyebrow,
+.metric-label {
+  margin: 0;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+.muted {
+  color: var(--muted) !important;
+}
+
+.small {
+  font-size: 0.75rem;
+}
+
+.spacer-sm {
+  margin-bottom: 1rem;
+}
+
+.neural-logo-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.app-logo-text {
+  font-size: 1.6rem !important;
+  font-weight: 800 !important;
+  font-family: "Space Grotesk", sans-serif;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, var(--on-surface) 0%, var(--primary) 50%, var(--on-surface) 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+  margin-bottom: 0.25rem !important;
+  animation: shimmer 4s infinite linear, logoPulse 4s infinite ease-in-out;
+}
+
+@keyframes shimmer {
+  to { background-position: 200% center; }
+}
+
+.logo-pulse {
+  animation: logoPulse 4s infinite ease-in-out;
+}
+
+@keyframes logoPulse {
+  0%, 100% { text-shadow: 0 0 10px rgba(0, 240, 255, 0.2); opacity: 0.9; }
+  50% { text-shadow: 0 0 30px rgba(0, 240, 255, 0.6); opacity: 1; }
+}
+
+/* ============================================================================
+ * CHIPS & STATUS PILLS
+ * ============================================================================ */
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1.5rem;
+}
+
+.chip,
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0; /* Hard edges */
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.chip {
+  padding: 0.4rem 0.8rem;
+  color: var(--primary);
+  background: rgba(0, 240, 255, 0.05);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  box-shadow: inset 0 0 10px rgba(0, 240, 255, 0.1);
+}
+
+.chip::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: var(--primary);
+  margin-right: 0.5rem;
+  box-shadow: 0 0 8px var(--primary);
+}
+
+/* ============================================================================
+ * COMPOSER CARD
+ * ============================================================================ */
+
+.composer-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.composer-header,
+.composer-footer,
+.artifact-heading,
+.meta-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.composer-header {
+  align-items: center;
+}
+
+/* ============================================================================
+ * FORM INPUTS — Terminal Style
+ * ============================================================================ */
+.main-textarea,
+.sidebar-textarea {
+  width: 100%;
+  border: none;
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--primary);
+  border-radius: 0;
+  border-bottom: 1px solid var(--outline);
+  transition: var(--transition);
+  font-family: "Space Grotesk", monospace;
+  padding: 1rem;
+  resize: vertical;
+}
+
+.main-textarea {
+  min-height: 160px;
+}
+
+.sidebar-textarea {
+  min-height: 100px;
+  font-size: 0.85rem;
+}
+
+.neural-icon {
+  filter: drop-shadow(0 0 8px var(--primary));
+  flex-shrink: 0;
+}
+
+/* ============================================================================
+ * CUSTOM SELECT — The Fix for BUG-1
+ * ============================================================================ */
+.custom-select-container {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  z-index: 5; /* Base level */
+}
+
+/* Ensure the active select or parent sidebar card doesn't clip the dropdown */
+.sidebar-card:has(.custom-select-container) {
+  overflow: visible !important;
+}
+
+.custom-select-trigger {
+  width: 100%;
+  padding: 0.5rem 0.6rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: none;
+  border-bottom: 1px solid var(--outline-variant);
+  color: var(--primary);
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.7rem; /* ~11px for maximum fit */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  text-align: left;
+}
+
+.custom-select-trigger:hover {
+  background: rgba(0, 240, 255, 0.05);
+  border-bottom-color: var(--primary);
+}
+
+.trigger-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  text-align: left;
+  font-size: 0.7rem; /* matched to trigger */
+  padding-right: 0.25rem;
+}
+
+.chevron {
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+  margin-left: 0.5rem;
+}
+
+.chevron.open {
+  transform: rotate(180deg);
+}
+
+.custom-select-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: var(--surface-container-highest);
+  border: 1px solid var(--outline);
+  box-shadow: var(--shadow-md);
+  z-index: 2000; /* Higher than other sidebar elements */
+  margin-top: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.custom-select-container.upwards .custom-select-dropdown {
+  top: auto;
+  bottom: 100%;
+  margin-top: 0;
+  margin-bottom: 8px;
+  box-shadow: 0 -4px 12px rgba(0,0,0,0.5);
+}
+
+.custom-select-option {
+  padding: 0.6rem 1rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  color: var(--on-surface-variant);
+  transition: var(--transition-fast);
+}
+
+.custom-select-option:hover {
+  background: rgba(0, 240, 255, 0.1);
+  color: var(--primary);
+}
+
+.custom-select-option.selected {
+  background: var(--primary);
+  color: var(--surface);
+}
+
+.main-textarea:focus,
+.sidebar-textarea:focus,
+.select-field:focus {
+  outline: none;
+  background: rgba(0, 240, 255, 0.05);
+  border-bottom: 2px solid var(--primary);
+  box-shadow: 0 10px 20px -10px rgba(0, 240, 255, 0.3);
+}
+
+/* ============================================================================
+ * BUTTONS — Kinetic Triggers
+ * ============================================================================ */
+
+.primary-button,
+.ghost-button,
+.upload-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  font-family: "Space Grotesk", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.primary-button,
+.upload-label {
+  background: var(--primary);
+  color: var(--surface);
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+}
+
+/* The scanning gradient pseudo-element for primary buttons */
+.primary-button::before,
+.upload-label::before {
+  content: "";
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: opacity 0.3s;
+  opacity: 0;
+}
+
+.primary-button {
+  padding: 0.85rem 1.5rem;
+  font-size: 0.85rem;
+}
+
+.primary-button.large {
+  padding: 1rem 2rem;
+  font-size: 0.95rem;
+}
+
+.ghost-button {
+  padding: 0.8rem 1.25rem;
+  background: rgba(10, 10, 15, 0.8);
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  backdrop-filter: blur(8px);
+  font-size: 0.8rem;
+}
+
+.primary-button:hover:not(:disabled),
+.upload-label:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 25px rgba(0, 240, 255, 0.6);
+}
+
+.primary-button:hover::before,
+.upload-label:hover::before {
+  animation: buttonScan 1.5s infinite linear;
+  opacity: 1;
+}
+
+.ghost-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: rgba(0, 240, 255, 0.1);
+  box-shadow: inset 0 0 15px rgba(0, 240, 255, 0.2), 0 0 15px rgba(0, 240, 255, 0.2);
+}
+
+.primary-button:disabled,
+.ghost-button:disabled,
+.secondary-button:disabled,
+.upload-label:has(input:disabled) {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.upload-label {
+  width: 100%;
+  padding: 0.85rem 1rem;
+}
+
+.upload-label input {
+  display: none;
+}
+
+/* ============================================================================
+ * FORM GROUPING
+ * ============================================================================ */
+
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-bottom: 1.2rem;
+}
+
+.form-section:last-child {
+  margin-bottom: 0;
+}
+
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.button-group > button,
+.button-group > label {
+  width: 100%;
+  margin: 0;
+}
+
+.secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0;
+  border: 1px solid var(--secondary);
+  background: rgba(255, 82, 92, 0.05);
+  color: var(--secondary);
+  padding: 0.8rem 1.25rem;
+  cursor: pointer;
+  transition: var(--transition);
+  font-weight: 700;
+  font-family: "Space Grotesk", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.8rem;
+}
+
+.secondary-button:hover:not(:disabled) {
+  background: rgba(255, 82, 92, 0.15);
+  box-shadow: 0 0 15px rgba(255, 82, 92, 0.4);
+}
+
+.sidebar-card .primary-button,
+.sidebar-card .secondary-button {
+  width: 100%;
+}
+
+.field-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--primary);
+  font-family: "Space Grotesk", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+}
+
+.mini-card {
+  padding: 1rem;
+  border-radius: 0;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--ghost-border);
+}
+
+.mini-card-title {
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.75rem;
+  margin-bottom: 0.4rem;
+  color: var(--primary);
+}
+
+/* ============================================================================
+ * METRICS GRID — Digital Counters
+ * ============================================================================ */
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.metric-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background: var(--surface-container-low);
+  border: 1px solid var(--outline-variant);
+}
+
+.metric-card strong {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary);
+  font-family: "Space Grotesk", sans-serif;
+  text-shadow: 0 0 15px rgba(0, 240, 255, 0.5);
+}
+
+/* Alternate colors for metric values */
+.metric-card:nth-child(even) strong {
+  color: var(--secondary);
+  text-shadow: 0 0 15px rgba(255, 82, 92, 0.5);
+}
+
+/* ============================================================================
+ * TAB BAR 
+ * ============================================================================ */
+
+.tab-bar {
+  display: flex;
+  gap: 0;
+  background: var(--surface-container);
+  border: 1px solid var(--ghost-border);
+  padding: 2px;
+  width: fit-content;
+}
+
+.tab-button {
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--muted);
+  padding: 0.75rem 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+  font-family: "Space Grotesk", sans-serif;
+  cursor: pointer;
+  font-size: 0.75rem;
+  transition: var(--transition);
+}
+
+.tab-button:hover:not(.active) {
+  color: var(--primary);
+  background: rgba(0, 240, 255, 0.05);
+}
+
+.tab-button.active {
+  background: var(--primary);
+  color: var(--surface);
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+}
+
+/* ============================================================================
+ * REPORT MARKDOWN
+ * ============================================================================ */
+
+.report-markdown {
+  color: var(--ink);
+}
+
+.report-markdown h1,
+.report-markdown h2,
+.report-markdown h3 {
+  font-family: "Space Grotesk", sans-serif;
+  text-transform: uppercase;
+  color: var(--primary);
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+}
+
+.report-markdown p,
+.report-markdown li {
+  color: var(--on-surface-variant);
+  line-height: 1.8;
+}
+
+.report-markdown ul,
+.report-markdown ol {
+  padding-left: 1.5rem;
+}
+
+/* ============================================================================
+ * TWO-COLUMN LAYOUT
+ * ============================================================================ */
+
+.two-column {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+.agent-card,
+.feed-card {
+  background: var(--surface-container-low);
+  border: 1px solid var(--ghost-border);
+}
+
+.agent-card {
+  border-left: 3px solid var(--secondary);
+}
+
+.agent-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.65rem;
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--secondary);
+  background: rgba(255, 82, 92, 0.1);
+  border: 1px solid rgba(255, 82, 92, 0.3);
+  margin-bottom: 0.6rem;
+  box-shadow: inset 0 0 8px rgba(255, 82, 92, 0.2);
+}
+
+/* ============================================================================
+ * COLLAPSIBLES
+ * ============================================================================ */
+
+.collapsible summary,
+.inline-details summary {
+  cursor: pointer;
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--primary);
+  margin-bottom: 1rem;
+  font-size: 0.8rem;
+}
+
+.artifact-heading {
+  margin-bottom: 0.75rem;
+}
+
+.artifact-heading h3 {
+  margin-bottom: 0.25rem;
+}
+
+/* ============================================================================
+ * STATUS PILLS
+ * ============================================================================ */
+
+.status-pill {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.65rem;
+  font-family: "Space Grotesk", sans-serif;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  background: rgba(0, 240, 255, 0.1);
+  color: var(--primary);
+  border: 1px solid var(--primary);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+}
+
+.status-pill.error {
+  background: rgba(255, 82, 92, 0.1);
+  color: var(--secondary);
+  border-color: var(--secondary);
+  box-shadow: 0 0 10px rgba(255, 82, 92, 0.2);
+}
+
+.status-pill.warning {
+  background: rgba(133, 35, 221, 0.1);
+  color: var(--tertiary);
+  border-color: var(--tertiary);
+  box-shadow: 0 0 10px rgba(133, 35, 221, 0.2);
+}
+
+.status-pill.success {
+  background: rgba(0, 240, 255, 0.1);
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+/* ============================================================================
+ * UTILITY CLASSES
+ * ============================================================================ */
+
+.muted {
+  color: var(--muted);
+}
+
+.composer-meta,
+.stacked-meta,
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.composer-meta {
+  gap: 0.35rem;
+  color: var(--muted);
+}
+
+/* ============================================================================
+ * CODE BLOCKS
+ * ============================================================================ */
+
+.code-block {
+  margin: 0;
+  padding: 1.25rem;
+  border-radius: 0;
+  background: #000;
+  color: var(--primary);
+  overflow-x: auto;
+  font-family: "JetBrains Mono", "Consolas", monospace;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  border: 1px solid var(--surface-container-high);
+}
+
+.code-block.output {
+  margin-top: 0.75rem;
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--on-surface);
+  border-left: 3px solid var(--primary);
+}
+
+.plot-gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(0, 240, 255, 0.03);
+  border: 1px solid var(--outline-variant);
+}
+
+.plot-image {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid var(--primary);
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.15);
+}
+
+/* ============================================================================
+ * LINKS
+ * ============================================================================ */
+
+.inline-link {
+  color: var(--primary);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px dotted var(--primary);
+  transition: var(--transition-fast);
+}
+
+.inline-link:hover {
+  background: var(--primary);
+  color: var(--surface);
+  text-shadow: none;
+}
+
+/* ============================================================================
+ * NOTICES & ERROR CHIPS
+ * ============================================================================ */
+
+.error-chip,
+.notice {
+  border-radius: 0;
+  padding: 1rem 1.25rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+  font-size: 0.85rem;
+}
+
+.error-chip,
+.notice-error {
+  background: rgba(255, 82, 92, 0.1);
+  color: var(--secondary);
+  border-color: rgba(255, 82, 92, 0.3);
+}
+
+.notice-success {
+  background: rgba(0, 240, 255, 0.1);
+  color: var(--primary);
+  border-color: rgba(0, 240, 255, 0.3);
+}
+
+.notice-info {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--ink);
+  border-color: var(--ghost-border);
+}
+
+.empty-state {
+  color: var(--muted);
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px dashed var(--ghost-border);
+  text-align: center;
+  font-family: "Space Grotesk", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 0.8rem;
+  padding: 3rem;
+}
+
+/* ============================================================================
+ * LOADING TOAST — Hologram
+ * ============================================================================ */
+
+.loading-toast {
+  position: fixed;
+  right: 2rem;
+  bottom: 2rem;
+  z-index: 50;
+  color: var(--primary);
+  background: rgba(10, 10, 15, 0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-radius: 0;
+  border: 1px solid var(--primary);
+  padding: 1rem 1.5rem;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+  font-weight: 700;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* ============================================================================
+ * ADVANCED TOOLS
+ * ============================================================================ */
+
+.advanced-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.advanced-copy code {
+  display: block;
+  padding: 0.85rem 1rem;
+  border-radius: 0;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--ghost-border);
+  font-family: "JetBrains Mono", "Consolas", monospace;
+  font-size: 0.75rem;
+  word-break: break-all;
+  color: var(--primary);
+}
+
+/* ============================================================================
+ * RESPONSIVE
+ * ============================================================================ */
+
+@media (max-width: 1100px) {
+  .workspace-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: static;
+    max-height: none;
+    border-right: none;
+    border-bottom: 1px solid var(--ghost-border);
+  }
+
+  .main-stage {
+    padding-left: 0;
+  }
+
+  .metrics-grid,
+  .two-column {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .workspace-shell {
+    padding: 1rem;
+  }
+
+  .metrics-grid,
+  .two-column {
+    grid-template-columns: 1fr;
+  }
+
+  .composer-header,
+  .composer-footer,
+  .artifact-heading,
+  .meta-row {
+    flex-direction: column;
+  }
+
+  .tab-bar {
+    overflow-x: auto;
+    width: 100%;
+  }
+
+  .hero h1 {
+    font-size: 2rem;
+  }
+}
+
+/* ============================================================================
+ * UNIFIED PROFESSIONAL LAYOUT (FINAL REFINEMENT)
+ * ============================================================================ */
+html, body {
+  height: 100%;
+  overflow: hidden !important;
+  margin: 0;
+  padding: 0;
+}
+
+.workspace-shell {
+  height: 100vh;
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  overflow: hidden;
+  background: var(--background);
+  /* Removed global padding to allow containers to scroll to edges */
+}
+
+/* Sidebar: Fixed Header + Scrollable content */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--surface);
+  border-right: 1px solid var(--outline-variant);
+  overflow: hidden;
+}
+
+.sidebar-header {
+  flex-shrink: 0;
+  padding: 0.75rem 1rem 0.25rem 1rem; /* Ultra Compact */
+  z-index: 10;
+}
+
+.branding-card {
+  padding: 0.5rem 0.75rem !important; /* High Density */
+  margin-bottom: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.neural-logo-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0;
+}
+
+.eyebrow {
+  font-size: 0.65rem !important;
+  letter-spacing: 0.15em;
+  opacity: 0.7;
+}
+
+.app-logo-text {
+  font-size: 1.1rem !important;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  margin: 0.1rem 0 !important;
+}
+
+.sidebar-scroll-area {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 0.5rem 1rem 2rem 1rem;
+  scrollbar-gutter: stable;
+}
+
+/* Main Stage: Explicit Headroom & Scrollable */
+.main-stage {
+  height: 100vh;
+  overflow-y: auto;
+  background: var(--background);
+  scrollbar-gutter: stable;
+  padding: 3.5rem 2rem 2rem 2.5rem; /* Large top padding to prevent clipping */
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.hero {
+  margin-bottom: 1rem;
+}
+
+.hero h1 {
+  font-size: 2.5rem;
+  line-height: 1.1;
+  margin: 0.5rem 0;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--outline-variant);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
+
+/* Mobile & Toasts */
+.mobile-toggle {
+  display: none !important;
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 5000;
+  background: var(--surface-container-high);
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  padding: 0.6rem;
+  border-radius: 4px;
+}
+
+@media (max-width: 1024px) {
+  .workspace-shell { grid-template-columns: 1fr !important; }
+  .mobile-toggle { display: block !important; }
+  .sidebar {
+    position: fixed;
+    left: -320px;
+    z-index: 4000;
+    transition: left 0.3s ease;
+    box-shadow: 20px 0 50px rgba(0,0,0,0.5);
+  }
+  .sidebar.open { left: 0; }
+  .main-stage { padding-left: 1rem; padding-right: 1rem; }
+}
+
+.toast-notification {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  min-width: 320px;
+  max-width: 480px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1rem 1.25rem;
+  background: rgba(10, 15, 25, 0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--outline);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 20px rgba(0, 240, 255, 0.15);
+  z-index: 10000;
+  animation: toastSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 8px;
+}
+
+.toast-content {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex: 1;
+}
+
+.toast-content svg {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.toast-notification.success svg { color: #00ff88; }
+.toast-notification.error svg { color: #ff4444; }
+
+.toast-content span {
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: var(--on-surface);
+  font-weight: 500;
+}
+
+.toast-close {
+  background: transparent;
+  border: none;
+  color: var(--on-surface-variant);
+  cursor: pointer;
+  font-size: 1.25rem;
+  padding: 0 0.25rem;
+  line-height: 1;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+
+.toast-close:hover { opacity: 1; }
+
+/* Artifact Entrance Animation */
+.artifact-entrance {
+  animation: artifactArrival 0.6s var(--transition) forwards;
+  opacity: 0;
+}
+
+@keyframes artifactArrival {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+    filter: blur(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+.run-research-btn-active {
+  animation: neonPulse 1.5s infinite;
+}
+
+/* Premium Animations */
+@keyframes neonPulse {
+  0% { box-shadow: 0 0 5px var(--primary-glow); }
+  50% { box-shadow: 0 0 20px var(--primary-glow); }
+  100% { box-shadow: 0 0 5px var(--primary-glow); }
+}
+
+.btn-primary:hover, .run-research-btn:hover {
+  animation: neonPulse 1.5s infinite;
+  transform: translateY(-1px);
+}
+
+.logo-text {
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, var(--primary), #669dff);
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.3));
+}
+[class*="nextjs-static-indicator"],
+[class*="nextjs-portal"],
+#nextjs-portal {
+  display: none !important;
+}
