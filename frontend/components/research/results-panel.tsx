@@ -109,10 +109,10 @@ export function ResultsPanel({
                 <p className="eyebrow" style={{ margin: 0 }}>Agent Activity</p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.25rem' }}>
                   <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#00ffff', boxShadow: '0 0 8px #00ffff', animation: 'pulse 2s infinite' }}></span>
-                  <span style={{ fontSize: '0.625rem', color: '#00ffff', fontWeight: 'bold', letterSpacing: '1px' }}>LIVE_OUTPUT_STREAM</span>
+                  <span style={{ fontSize: '0.625rem', color: '#00ffff', fontWeight: 'bold', letterSpacing: '1px' }}>LIVE_STREAM</span>
                 </div>
               </div>
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
                 <button 
                   onClick={() => {
                     if (confirm("Clear all activity logs? This cannot be undone.")) {
@@ -146,11 +146,13 @@ export function ResultsPanel({
                 className="log-container" 
                 ref={logContainerRef}
                 style={{ 
-                  height: '500px', 
+                  height: 'clamp(300px, 60vh, 500px)', 
                   overflowY: 'auto', 
+                  overflowX: 'hidden',
                   paddingRight: '0.5rem', 
                   fontFamily: 'monospace',
-                  scrollBehavior: 'smooth'
+                  scrollBehavior: 'smooth',
+                  width: '100%'
                 }}
               >
                 {researchState.agent_log.map((log, idx) => {
@@ -168,12 +170,14 @@ export function ResultsPanel({
                   const displayLog = timeMatch ? timeMatch[2] : log;
 
                   return (
-                    <div key={`log-${idx}`} className="log-entry" style={{ display: 'flex', gap: '1rem', padding: '0.5rem', borderLeft: `2px solid ${logTypeColor}33`, marginBottom: '2px', background: idx % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent', transition: 'background 0.2s' }} onMouseOver={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.05)')} onMouseOut={(e) => (e.currentTarget.style.background = idx % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent')}>
-                      <span suppressHydrationWarning style={{ width: '80px', flexShrink: 0, fontSize: '0.75rem', color: '#767576', borderRight: '1px solid rgba(255,255,255,0.05)', paddingRight: '1rem' }}>
-                        {displayTime}
-                      </span>
-                      <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: logTypeColor, width: '70px', flexShrink: 0 }}>{typeLabel}</span>
-                      <span style={{ fontSize: '0.75rem', color: '#ffffff', opacity: 0.9, lineHeight: '1.4' }}>{displayLog}</span>
+                    <div key={`log-${idx}`} className="log-entry" style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem 1rem', padding: '0.5rem', borderLeft: `2px solid ${logTypeColor}33`, marginBottom: '2px', background: idx % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent', transition: 'background 0.2s', width: '100%' }} onMouseOver={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.05)')} onMouseOut={(e) => (e.currentTarget.style.background = idx % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent')}>
+                      <div style={{ display: 'flex', gap: '1rem', flexShrink: 0 }}>
+                        <span suppressHydrationWarning style={{ width: '64px', flexShrink: 0, fontSize: '0.75rem', color: '#767576', borderRight: '1px solid rgba(255,255,255,0.05)', paddingRight: '0.5rem' }}>
+                          {displayTime}
+                        </span>
+                        <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: logTypeColor, width: '60px', flexShrink: 0 }}>{typeLabel}</span>
+                      </div>
+                      <span style={{ fontSize: '0.75rem', color: '#ffffff', opacity: 0.9, lineHeight: '1.4', wordBreak: 'break-word', flex: 1, minWidth: '200px' }}>{displayLog}</span>
                     </div>
                   );
                 })}
@@ -206,8 +210,8 @@ export function ResultsPanel({
                 <div style={{ animation: 'pulse 1.5s infinite', fontSize: '0.75rem', fontWeight: 'bold' }}>INITIALIZING_DATA_STREAM...</div>
               </div>
             ) : isMounted && datasetPreview ? (
-              <div style={{ overflowX: 'auto', overflowY: 'auto', height: '500px' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'monospace', fontSize: '0.75rem' }}>
+              <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', height: 'clamp(300px, 60vh, 500px)', width: '100%', position: 'relative' }}>
+                <table style={{ width: '100%', minWidth: '800px', borderCollapse: 'collapse', fontFamily: 'monospace', fontSize: '0.75rem' }}>
                   <thead style={{ position: 'sticky', top: 0, zIndex: 20, background: 'var(--surface-container-highest)', boxShadow: '0 2px 10px rgba(0,0,0,0.3)' }}>
                     <tr>
                       {datasetPreview.columns.map((col) => (
@@ -272,7 +276,7 @@ export function ResultsPanel({
         >
           <Card variant="panel">
             <p className="eyebrow">Research Artifacts</p>
-          <div className="artifacts-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+          <div className="artifacts-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '1.5rem' }}>
               {researchState.dataset_outputs.map((dataset, idx) => (
                 <Card variant="artifact" key={`artifact-ds-${idx}`} style={{ position: 'relative', overflow: 'hidden', padding: '1.5rem', border: '1px solid rgba(255,255,255,0.05)', transition: 'border-color 0.3s ease' }} onMouseOver={(e) => (e.currentTarget.style.borderColor = 'rgba(0, 255, 255, 0.3)')} onMouseOut={(e) => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)')}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
