@@ -17,6 +17,14 @@ class Settings(BaseSettings):
     # Local embeddings
     embedding_model: str = "BAAI/bge-base-en-v1.5"
 
+    # CORS
+    cors_allowed_origins: str = (
+        "http://localhost:3000,"
+        "http://127.0.0.1:3000,"
+        "http://localhost:3001,"
+        "http://127.0.0.1:3001"
+    )
+
     # ChromaDB
     chroma_persist_dir: str = "./chroma_db"
     chroma_collection: str = "research_docs"

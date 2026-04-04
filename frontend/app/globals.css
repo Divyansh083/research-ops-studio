@@ -65,6 +65,7 @@
   /* Motion */
   --transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
   --transition-fast: all 140ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-sidebar: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 * {
@@ -172,6 +173,14 @@ a {
   padding: 1.5rem;
   align-items: start;
   position: relative;
+  transition: var(--transition);
+}
+
+@media (max-width: 1100px) {
+  .workspace-shell {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+  }
 }
 
 .sidebar, .main-stage {
@@ -194,6 +203,82 @@ a {
   overflow-x: hidden;
   scrollbar-width: thin;
   scrollbar-color: var(--outline) transparent;
+  transition: transform 0.4s var(--transition);
+  z-index: 100;
+}
+
+@media (max-width: 1100px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 320px;
+    max-height: 100vh;
+    background: rgba(13, 13, 18, 0.95);
+    backdrop-filter: blur(32px);
+    border-right: 1px solid var(--outline-variant);
+    transform: translateX(-100%);
+    box-shadow: 20px 0 50px rgba(0, 0, 0, 0.8);
+    padding-top: 5rem; /* Space for the mobile toggle back-button if needed */
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+}
+
+@media (max-width: 480px) {
+  .sidebar {
+    width: 100%;
+  }
+}
+
+/* ============================================================================
+ * MOBILE CONTROLS & OVERLAYS
+ * ============================================================================ */
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  z-index: 95;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.mobile-toggle {
+  display: none;
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  width: 48px;
+  height: 48px;
+  background: var(--paper);
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  z-index: 1000;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+  transition: var(--transition-fast);
+}
+
+.mobile-toggle:hover {
+  background: var(--primary);
+  color: var(--surface);
+  box-shadow: 0 0 25px rgba(0, 240, 255, 0.6);
+}
+
+@media (max-width: 1100px) {
+  .mobile-toggle {
+    display: flex;
+  }
 }
 
 /* ============================================================================
@@ -205,6 +290,14 @@ a {
   flex-direction: column;
   gap: 1.5rem;
   padding: 0.5rem 0 0.5rem 2rem;
+  min-width: 0;
+  max-width: 100%;
+}
+
+@media (max-width: 1100px) {
+  .main-stage {
+    padding: 0.5rem 0;
+  }
 }
 
 /* ============================================================================
@@ -436,6 +529,7 @@ a {
   justify-content: space-between;
   gap: 1rem;
   align-items: flex-start;
+  flex-wrap: wrap;
 }
 
 .composer-header {
@@ -769,8 +863,14 @@ a {
 
 .metrics-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
+}
+
+@media (max-width: 480px) {
+  .metrics-grid {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  }
 }
 
 .metric-card {
@@ -806,6 +906,14 @@ a {
   border: 1px solid var(--ghost-border);
   padding: 2px;
   width: fit-content;
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none; /* Hide scrollbar for clean look */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+.tab-bar::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
 }
 
 .tab-button {
@@ -870,6 +978,12 @@ a {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1.5rem;
+}
+
+@media (max-width: 900px) {
+  .two-column {
+    grid-template-columns: 1fr;
+  }
 }
 
 .agent-card,

@@ -409,6 +409,13 @@ export function ResearchWorkspace() {
         lastGeneratedDataset={lastGeneratedDataset}
       />
 
+      {sidebarOpen && (
+        <div 
+          className="sidebar-backdrop" 
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       <main className="main-stage">
         <section className="hero">
           <p className="eyebrow">Local Research Workspace</p>

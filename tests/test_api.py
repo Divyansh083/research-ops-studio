@@ -2,6 +2,7 @@ import base64
 from unittest.mock import patch
 from fastapi.testclient import TestClient
 from app.main import app
+from app.main import get_allowed_origins
 
 def test_config_endpoint_returns_runtime_payload():
     with patch("app.api.routers.system.list_datasets", return_value=[{"path": "C:/data/test.csv"}]), patch(
@@ -124,3 +125,11 @@ def test_research_stream_endpoint_yields_updates_and_complete_snapshot():
     assert response.status_code == 200
     assert any('"type": "update"' in line for line in lines)
     assert any('"type": "complete"' in line for line in lines)
+
+
+def test_get_allowed_origins_parses_env_list():
+    with patch("app.main.settings.cors_allowed_origins", "http://localhost:3000, https://demo.vercel.app"):
+        assert get_allowed_origins() == [
+            "http://localhost:3000",
+            "https://demo.vercel.app",
+        ]
