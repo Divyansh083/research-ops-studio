@@ -376,6 +376,13 @@ class TestSafePreamble:
         result = inject_safe_preamble(code)
         assert result.count("Sandbox Safe Preamble") == 1
 
+    def test_preamble_skips_auto_saving_explicit_matplotlib_files(self):
+        code = "import matplotlib.pyplot as plt\nplt.plot([1, 2], [3, 4])\nplt.savefig('plot.png')\nplt.show()\n"
+        result = inject_safe_preamble(code)
+        assert "_sandbox_saved_explicitly" in result
+        assert "_sandbox_Figure.savefig = _sandbox_capture_savefig" in result
+        assert "if getattr(_sandbox_fig, \"_sandbox_saved_explicitly\", False):" in result
+
 
 # =========================================================================
 # Model tests

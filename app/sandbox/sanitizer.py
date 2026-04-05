@@ -429,14 +429,25 @@ try:
     import matplotlib
     matplotlib.use("Agg")
     from matplotlib import pyplot as _sandbox_plt
+    from matplotlib.figure import Figure as _sandbox_Figure
 
     _sandbox_plot_dir = _sandbox_os.getenv("CODE_EXEC_PLOT_DIR", _sandbox_os.getcwd())
     _sandbox_os.makedirs(_sandbox_plot_dir, exist_ok=True)
     _sandbox_orig_show = _sandbox_plt.show
+    _sandbox_orig_figure_savefig = _sandbox_Figure.savefig
+
+    def _sandbox_capture_savefig(self, *args, **kwargs):
+        setattr(self, "_sandbox_saved_explicitly", True)
+        return _sandbox_orig_figure_savefig(self, *args, **kwargs)
+
+    _sandbox_Figure.savefig = _sandbox_capture_savefig
 
     def _sandbox_capture_show(*args, **kwargs):
         for _i, _num in enumerate(_sandbox_plt.get_fignums(), 1):
-            _sandbox_plt.figure(_num).savefig(
+            _sandbox_fig = _sandbox_plt.figure(_num)
+            if getattr(_sandbox_fig, "_sandbox_saved_explicitly", False):
+                continue
+            _sandbox_fig.savefig(
                 _sandbox_os.path.join(_sandbox_plot_dir, f"figure_{_i}.png"),
                 dpi=150, bbox_inches="tight",
             )

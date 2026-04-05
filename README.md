@@ -59,6 +59,9 @@ Default examples in [.env.example](C:\Users\user\Desktop\Personal_project\.env.e
 
 ## Setup
 
+Render note:
+- If you deploy on Render, pin Python with `PYTHON_VERSION=3.11.11` in the service environment or by keeping the repo-root `.python-version` file.
+
 ### 1. Install dependencies
 
 ```bash
