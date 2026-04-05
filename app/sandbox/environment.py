@@ -14,7 +14,7 @@ from packaging.utils import canonicalize_name
 
 from app.core.config import settings
 
-SANDBOX_PACKAGES = ["pandas", "numpy", "matplotlib", "scipy", "seaborn", "scikit-learn"]
+SANDBOX_PACKAGES = ["pandas", "numpy", "matplotlib"]
 
 
 def get_sandbox_root() -> Path:
@@ -100,7 +100,11 @@ def _iter_required_distributions() -> list[metadata.Distribution]:
 
     while queue:
         requirement_name = queue.pop(0)
-        distribution = metadata.distribution(requirement_name)
+        try:
+            distribution = metadata.distribution(requirement_name)
+        except metadata.PackageNotFoundError:
+            # Skip optional packages that are not installed in the host environment.
+            continue
         canonical_name = canonicalize_name(distribution.metadata["Name"])
         if canonical_name in seen:
             continue

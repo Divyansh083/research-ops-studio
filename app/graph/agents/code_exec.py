@@ -22,8 +22,8 @@ CODE_PROMPT = ChatPromptTemplate.from_messages(
         (
             "system",
             """You are a data analysis agent. Write Python code to answer the subtask.
-You can use any standard library plus pandas, numpy, matplotlib, seaborn, and scipy.
-If you need other libraries, assume they are available or the system will handle it.
+You can use any standard library plus pandas, numpy, and matplotlib.
+Do not assume any other third-party libraries are available.
 Print the answer and any key findings to stdout.
 You are encouraged to generate relevant files (CSV, PDF, PNG, JSON) in the current directory if they help the research.
 Never invent or simulate data. If the task does not provide data, do not fabricate an example.
@@ -47,7 +47,7 @@ IMPORTANT DEBUGGING RULES:
 3. If the error is `FileNotFoundError`, strictly use the provided `DATASET_PATH` without prepending directories.
 4. Do NOT attempt to remove the sandbox safe preamble at the top of the file. Leave the imports intact.
 5. Do NOT use eval(), exec(), __import__(), subprocess, os.system(), or any blocked operations.
-6. Only use safe libraries: pandas, numpy, matplotlib, seaborn, scipy, scikit-learn, and standard lib.
+6. Only use safe libraries: pandas, numpy, matplotlib, and standard lib.
 
 Return ONLY the corrected, raw Python code. Do not wrap it in markdown formatting or ```python fences. Provide zero explanation.""",
         ),

@@ -157,8 +157,6 @@ _BLOCKED_CALLS: set[str] = {
 _SAFE_MODULES: set[str] = {
     # Core data-science
     "pandas", "numpy", "matplotlib", "matplotlib.pyplot",
-    "seaborn", "scipy", "scipy.stats", "scipy.optimize",
-    "sklearn", "scikit-learn",
     # Standard lib safe subset
     "math", "statistics", "decimal", "fractions",
     "collections", "itertools", "functools", "operator",

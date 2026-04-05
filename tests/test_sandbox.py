@@ -12,6 +12,7 @@ Covers:
 from __future__ import annotations
 
 import json
+from importlib import metadata
 import math
 from pathlib import Path
 from unittest.mock import MagicMock, patch
@@ -517,6 +518,24 @@ class TestExecutor:
 
 
 class TestSandboxEnvironment:
+    @patch("app.sandbox.environment.metadata.distribution")
+    def test_iter_required_distributions_skips_missing_optional_packages(self, mock_distribution):
+        from app.sandbox.environment import _iter_required_distributions
+
+        pandas_dist = MagicMock()
+        pandas_dist.metadata = {"Name": "pandas"}
+        pandas_dist.requires = []
+
+        def distribution_side_effect(name):
+            if name == "pandas":
+                return pandas_dist
+            raise metadata.PackageNotFoundError(name)
+
+        mock_distribution.side_effect = distribution_side_effect
+
+        distributions = _iter_required_distributions()
+        assert [dist.metadata["Name"] for dist in distributions] == ["pandas"]
+
     @patch("app.sandbox.environment._run_command")
     def test_sandbox_packages_ready_checks_imports(self, mock_run_command):
         from app.sandbox.environment import sandbox_packages_ready
