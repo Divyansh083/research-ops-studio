@@ -17,7 +17,7 @@ import { ResultsPanel } from "./research/results-panel";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
 const EXAMPLE_QUERY =
-  "Create a school dataset and then write and execute a Python script to analyze attendance and subject scores.";
+  "Create a dataset of 25 students with Name, GradeLevel, AttendanceRate, MathScore, ScienceScore, and EnglishScore. Then analyze the correlation between attendance and academic performance, generate comparison charts, and research best practices for improving student attendance in schools.";
 
 async function parseJson<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE}${path}`, {
@@ -371,25 +371,27 @@ export function ResearchWorkspace() {
       </button>
 
       {notice && (
-        <div className={`toast-notification ${notice.tone}`}>
-          <div className="toast-content">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              {notice.tone === 'success' ? (
-                <>
-                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                  <polyline points="22 4 12 14.01 9 11.01" />
-                </>
-              ) : (
-                <>
-                  <circle cx="12" cy="12" r="10" />
-                  <line x1="12" y1="8" x2="12" y2="12" />
-                  <line x1="12" y1="16" x2="12.01" y2="16" />
-                </>
-              )}
-            </svg>
-            <span>{notice.message}</span>
+        <div className={`toast-notification ${notice.tone}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem 1.5rem', background: 'var(--surface-container-high)', border: `1px solid ${notice.tone === 'error' ? 'var(--error)' : 'var(--success)'}`, borderRadius: '8px', boxShadow: '0 10px 30px rgba(0,0,0,0.5)', gap: '1rem' }}>
+          <div className="toast-content" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: notice.tone === 'error' ? 'var(--error)' : 'var(--mint)' }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                {notice.tone === 'success' ? (
+                  <>
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                    <polyline points="22 4 12 14.01 9 11.01" />
+                  </>
+                ) : (
+                  <>
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                  </>
+                )}
+              </svg>
+            </div>
+            <span style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--text-primary)', lineHeight: 1.4 }}>{notice.message}</span>
           </div>
-          <button className="toast-close" onClick={() => setNotice(null)}>&times;</button>
+          <button className="toast-close" onClick={() => setNotice(null)} style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', fontSize: '1.25rem', cursor: 'pointer', padding: '0', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'color 0.2s' }} onMouseOver={(e) => e.currentTarget.style.color = '#fff'} onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}>&times;</button>
         </div>
       )}
 

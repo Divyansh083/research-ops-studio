@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { createPortal } from "react-dom";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { ResearchSnapshot } from "../../types/research";
@@ -58,37 +59,150 @@ export function ResultsPanel({
           aria-labelledby="tab-report"
           tabIndex={0}
         >
-          <Card variant="panel">
+          <Card variant="panel" style={{ position: 'relative', overflow: 'hidden' }}>
             <p className="eyebrow">Final Report</p>
-            {deferredReport ? (
-              <article>
-                <div className="report-content report-markdown">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{deferredReport}</ReactMarkdown>
-                  
-                  {researchState.code_outputs?.some(c => c.artifacts?.length) && (
-                    <div className="report-plots">
-                      <h2 className="mt-8 mb-6">Generated Visualizations</h2>
-                      <div className="plot-gallery">
-                        {researchState.code_outputs.flatMap(c => c.artifacts || [])
-                          .filter(file => /\.(png|jpg|jpeg|gif|webp|svg)$/i.test(file))
-                          .map((file, idx) => (
-                            <img
-                              key={`report-plot-${file}-${idx}`}
-                              src={`${apiBase}/api/sandbox/files/${file}`}
-                              alt={`Generated plot ${idx + 1}`}
-                              className="plot-image"
-                            />
-                          ))}
+            {(() => {
+              if (!deferredReport) {
+                return (
+                  <div className="empty-state">
+                    Your finished report will appear here after the research run completes.
+                  </div>
+                );
+              }
+              
+              if (deferredReport.includes("Rate Limit Exceeded")) {
+                const dialogContent = (
+                  <div style={{
+                    position: 'fixed',
+                    top: 0, left: 0, right: 0, bottom: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: 'rgba(19, 19, 24, 0.85)', /* match surface */
+                    backdropFilter: 'blur(12px)',
+                    zIndex: 999999,
+                    animation: 'backdropFade 600ms ease-in-out forwards'
+                  }}>
+                    <div style={{
+                      background: 'var(--surface-container-high)',
+                      border: '1px solid rgba(0, 240, 255, 0.15)',
+                      boxShadow: '0 10px 40px rgba(0, 0, 0, 0.5), 0 0 50px rgba(0, 240, 255, 0.05)',
+                      padding: '3rem',
+                      maxWidth: '550px',
+                      width: '90%',
+                      textAlign: 'center',
+                      position: 'relative',
+                      overflow: 'hidden',
+                      borderRadius: '12px',
+                      animation: 'premiumFadeScale 600ms cubic-bezier(0.16, 1, 0.3, 1) forwards'
+                    }}>
+                      <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'repeating-linear-gradient(rgba(0,255,255,0.03) 0px, transparent 1px, transparent 2px)', backgroundSize: '100% 3px', zIndex: 0 }}></div>
+                      
+                      <div style={{ position: 'relative', zIndex: 1 }}>
+                        <div style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          width: '64px', height: '64px',
+                          borderRadius: '50%',
+                          background: 'rgba(0, 240, 255, 0.05)',
+                          border: '1px solid rgba(0, 240, 255, 0.2)',
+                          color: 'var(--primary)',
+                          marginBottom: '1.5rem',
+                          boxShadow: '0 0 20px rgba(0, 240, 255, 0.1)'
+                        }}>
+                          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: 'translateY(-1px)' }}>
+                            <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+                            <line x1="12" y1="9" x2="12" y2="13" />
+                            <line x1="12" y1="17" x2="12.01" y2="17" />
+                          </svg>
+                        </div>
+                        
+                        <h2 style={{ color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '3px', marginBottom: '1rem', fontSize: '1.5rem', fontFamily: 'var(--font-space-grotesk)' }}>
+                          Rate Limit Exceeded
+                        </h2>
+                        
+                        <p style={{ color: '#b9cacb', marginBottom: '2.5rem', lineHeight: 1.6, fontSize: '1rem' }}>
+                          The AI model API has reached its token limits. The research run has been vaulted to prevent data corruption. Please wait a few minutes or switch to an alternate model.
+                        </p>
+                        
+                        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                          <button 
+                            onClick={() => setActiveTab('activity')}
+                            style={{
+                              background: 'transparent',
+                              border: '1px solid var(--ghost-border)',
+                              color: '#b9cacb',
+                              padding: '0.75rem 1.5rem',
+                              cursor: 'pointer',
+                              textTransform: 'uppercase',
+                              letterSpacing: '2px',
+                              fontSize: '0.75rem',
+                              fontWeight: 'bold',
+                              transition: 'all 0.2s',
+                              borderRadius: '4px'
+                            }}
+                            onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = '#fff' }}
+                            onMouseOut={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#b9cacb' }}
+                          >
+                            View Logs
+                          </button>
+                          <button 
+                            onClick={() => window.location.reload()}
+                            style={{
+                              background: 'var(--primary)',
+                              border: 'none',
+                              color: '#002022',
+                              padding: '0.75rem 1.5rem',
+                              cursor: 'pointer',
+                              textTransform: 'uppercase',
+                              letterSpacing: '2px',
+                              fontSize: '0.75rem',
+                              fontWeight: 'bold',
+                              boxShadow: '0 0 15px rgba(0, 240, 255, 0.4)',
+                              transition: 'all 0.2s',
+                              borderRadius: '4px'
+                            }}
+                            onMouseOver={(e) => { e.currentTarget.style.boxShadow = '0 0 25px rgba(0, 240, 255, 0.8)'; e.currentTarget.style.transform = 'scale(1.02)' }}
+                            onMouseOut={(e) => { e.currentTarget.style.boxShadow = '0 0 15px rgba(0, 240, 255, 0.4)'; e.currentTarget.style.transform = 'scale(1)' }}
+                          >
+                            Acknowledge
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  )}
-                </div>
-              </article>
-            ) : (
-              <div className="empty-state">
-                Your finished report will appear here after the research run completes.
-              </div>
-            )}
+                  </div>
+                );
+                
+                return isMounted ? createPortal(dialogContent, document.body) : null;
+              }
+              
+              return (
+                <article>
+                  <div className="report-content report-markdown">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{deferredReport}</ReactMarkdown>
+                    
+                    {researchState.code_outputs?.some(c => c.artifacts?.length) && (
+                      <div className="report-plots">
+                        <h2 className="mt-8 mb-6">Generated Visualizations</h2>
+                        <div className="plot-gallery">
+                          {researchState.code_outputs.flatMap(c => c.artifacts || [])
+                            .filter(file => /\.(png|jpg|jpeg|gif|webp|svg)$/i.test(file))
+                            .map((file, idx) => (
+                              <img
+                                key={`report-plot-${file}-${idx}`}
+                                src={`${apiBase}/api/sandbox/files/${file}`}
+                                alt={`Generated plot ${idx + 1}`}
+                                className="plot-image"
+                              />
+                            ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </article>
+              );
+            })()}
           </Card>
         </div>
       )}

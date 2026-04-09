@@ -4,6 +4,7 @@ from langchain_core.prompts import ChatPromptTemplate
 
 from app.graph.llm import get_llm
 from app.graph.state import ResearchState
+from app.graph.quality_loop import quality_loop
 
 SUMMARISER_PROMPT = ChatPromptTemplate.from_messages(
     [
@@ -69,12 +70,36 @@ def summariser_node(state: ResearchState) -> dict:
 
     try:
         llm = get_llm()
-        response = llm.invoke(
-            SUMMARISER_PROMPT.format_messages(query=query, evidence=evidence_text)
+
+        def _generate() -> str:
+            response = llm.invoke(
+                SUMMARISER_PROMPT.format_messages(query=query, evidence=evidence_text)
+            )
+            return str(response.content)
+
+        # Use a lighter threshold for summaries (intermediate product)
+        loop_result = quality_loop(
+            generate_fn=_generate,
+            query=query,
+            context_type="evidence_summary",
+            min_score=2.5,
         )
+
+        # Build agent log with quality metadata
+        agent_logs = []
+        for verdict in loop_result.history:
+            scores = verdict.criteria_scores
+            score_detail = ", ".join(f"{k}={v}" for k, v in scores.items()) if scores else "n/a"
+            status = "accepted" if verdict.passed else "retrying"
+            agent_logs.append(
+                f"Summariser attempt {verdict.attempt}: quality {verdict.score}/5 "
+                f"({score_detail}) — {status}"
+            )
+        agent_logs.append(f"Summariser agent completed for '{query}'")
+
         return {
-            "summaries": [str(response.content)],
-            "agent_log": [f"Summariser agent completed for '{query}'"],
+            "summaries": [loop_result.output],
+            "agent_log": agent_logs,
         }
     except Exception as exc:
         return {

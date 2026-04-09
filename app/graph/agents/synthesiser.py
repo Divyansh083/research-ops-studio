@@ -4,15 +4,19 @@ from langchain_core.prompts import ChatPromptTemplate
 
 from app.graph.llm import get_llm
 from app.graph.state import ResearchState
+from app.graph.quality_loop import quality_loop
 
 SYNTHESISER_PROMPT = ChatPromptTemplate.from_messages(
     [
         (
             "system",
-            """You are a senior, highly analytical research expert. Synthesise the findings below into an extremely comprehensive, in-depth, and highly detailed report in Markdown.
-Do NOT just summarize briefly. Expand aggressively on the implications of the data. Write multi-paragraph analyses and detailed bullet points for every piece of information.
+            """You are a senior, highly analytical research expert. Synthesise the findings below into a report in Markdown.
 
-Use this structure exactly, ensuring each section is content-rich and highly detailed:
+ADAPTIVE LENGTH RULE:
+- If the query is a simple factual question (e.g. "what is today's date", "who founded X", "what is the capital of Y"), give a SHORT, direct answer in 2-5 sentences. Do NOT create multiple sections or pad with generic advice.
+- If the query is a complex research question, produce a comprehensive, in-depth, and highly detailed report using the full structure below.
+
+For COMPLEX queries, use this structure exactly, ensuring each section is content-rich:
 ## Executive Summary
 (Write a full, dense paragraph overviewing the entire dataset and purpose)
 ## Key Findings
@@ -20,14 +24,15 @@ Use this structure exactly, ensuring each section is content-rich and highly det
 ## Analysis
 (Provide a deep, multi-paragraph breakdown of what the data means, trends, and significance)
 ## Code Output and Data
-(Detail the mathematical and programmatic results returned by the code agent)
+(Detail the mathematical and programmatic results returned by the code agent — ONLY if code was executed)
 ## Sources
 (List all URLs and references)
 
 Be extremely factual, analytical, and cite sources throughout.
 Only describe code-derived findings when there are successful execution outputs.
 If code was generated but skipped or failed, say that clearly and do not infer hypothetical charts.
-If the code output mentions generated artifacts, list them clearly as visual or data evidence and explain what they represent.""",
+If the code output mentions generated artifacts, list them clearly as visual or data evidence and explain what they represent.
+NEVER include generic "best practices", "recommendations", or "tips" sections unless the user explicitly asked for advice.""",
         ),
         (
             "human",
@@ -148,8 +153,7 @@ def synthesiser_node(state: ResearchState) -> dict:
             ]
         ) or "No generated code attempts."
 
-        # Filter out errors from the error_log if they are just transient CodeExec/sandbox
-        # errors that were successfully recovered from on retry.
+        # Filter out transient errors
         active_errors = []
         has_successful_code = any(item.get("status") == "success" for item in state.get("code_outputs", []))
         
@@ -160,44 +164,77 @@ def synthesiser_node(state: ResearchState) -> dict:
             active_errors.append(err)
 
         llm = get_llm()
-        if _has_evidence(state):
-            response = llm.invoke(
-                SYNTHESISER_PROMPT.format_messages(
-                    query=state["query"],
-                    summaries=summaries_text,
-                    dataset_outputs=dataset_text,
-                    search_results=search_text,
-                    rag_results=rag_text,
-                    code_outputs=code_text,
-                    code_attempts=code_attempts_text,
-                    errors="\n".join(active_errors) or "No non-fatal errors.",
+        query = state["query"]
+        has_evidence = _has_evidence(state)
+
+        # === Quality-gated generation ===
+        def _generate() -> str:
+            if has_evidence:
+                response = llm.invoke(
+                    SYNTHESISER_PROMPT.format_messages(
+                        query=query,
+                        summaries=summaries_text,
+                        dataset_outputs=dataset_text,
+                        search_results=search_text,
+                        rag_results=rag_text,
+                        code_outputs=code_text,
+                        code_attempts=code_attempts_text,
+                        errors="\n".join(active_errors) or "No non-fatal errors.",
+                    )
                 )
+            else:
+                response = llm.invoke(
+                    FALLBACK_SYNTHESISER_PROMPT.format_messages(
+                        query=query,
+                        errors="\n".join(state.get("error_log", [])) or "No tool errors logged.",
+                    )
+                )
+            return str(response.content)
+
+        loop_result = quality_loop(
+            generate_fn=_generate,
+            query=query,
+            context_type="research_report",
+        )
+
+        # Build agent log with quality metadata
+        agent_logs = []
+        for verdict in loop_result.history:
+            scores = verdict.criteria_scores
+            score_detail = ", ".join(f"{k}={v}" for k, v in scores.items()) if scores else "n/a"
+            status = "accepted" if verdict.passed else "retrying"
+            agent_logs.append(
+                f"Synthesiser attempt {verdict.attempt}: quality {verdict.score}/5 "
+                f"({score_detail}) — {status}"
             )
-            report_text = str(response.content)
-            agent_message = "Synthesiser: final report generated successfully"
+
+        if has_evidence:
+            agent_logs.append("Synthesiser: final report generated successfully")
         else:
-            response = llm.invoke(
-                FALLBACK_SYNTHESISER_PROMPT.format_messages(
-                    query=state["query"],
-                    errors="\n".join(state.get("error_log", [])) or "No tool errors logged.",
-                )
-            )
-            report_text = str(response.content)
-            agent_message = "Synthesiser: fallback report generated from model knowledge"
+            agent_logs.append("Synthesiser: fallback report generated from model knowledge")
 
         return {
-            "final_report": report_text,
-            "agent_log": [agent_message],
+            "final_report": loop_result.output,
+            "agent_log": agent_logs,
         }
     except Exception as exc:
-        fallback_report = (
-            "# Report Generation Failed\n\n"
-            f"Error: {exc}\n\n"
-            "Raw summaries:\n\n"
-            + "\n\n".join(state.get("summaries", []))
-        )
+        err_msg = str(exc)
+        
+        # Check if it's a 429 Rate Limit Error
+        if "429" in err_msg or "rate_limit_exceeded" in err_msg:
+            fallback_report = (
+                "# ⚠️ Critical System Notice: Rate Limit Exceeded\n\n"
+                "> The AI model API (Groq) has reached its token limits. The research run was paused to prevent data loss.\n\n"
+                "*Please wait a few minutes before trying the query again, or switch to an alternate model in the configuration.*"
+            )
+        else:
+            fallback_report = (
+                "# Report Generation Failed\n\n"
+                f"**Error Details:**\n```\n{err_msg}\n```\n\n"
+            )
+            
         return {
             "final_report": fallback_report,
             "error_log": [f"Synthesiser error: {exc}"],
-            "agent_log": ["Synthesiser: failed, returned raw summaries as fallback"],
+            "agent_log": ["Synthesiser: failed, returned formatted error block"],
         }

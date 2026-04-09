@@ -289,9 +289,57 @@ def _is_dataset_creation_request(query_lower: str) -> bool:
 
 def query_requires_dataset_manager(state: ResearchState) -> bool:
     query_lower = state["query"].lower()
+
+    # Always route if the user explicitly asks to create/generate a dataset
     if _is_dataset_creation_request(query_lower):
         return True
 
+    # ── Guard: Conceptual queries should NEVER trigger dataset_manager ──
+    # If the query is asking a research/conceptual question, even if it mentions
+    # data-related words like "student" or "attendance", it does NOT need a dataset.
+    conceptual_markers = (
+        "what are",
+        "what is",
+        "how does",
+        "how do",
+        "why does",
+        "why do",
+        "explain",
+        "describe",
+        "overview",
+        "compare",
+        "difference",
+        "impact of",
+        "effect of",
+        "relationship between",
+        "key trends",
+        "factors",
+    )
+    is_conceptual = any(marker in query_lower for marker in conceptual_markers)
+
+    # Explicit data-action phrases that DO require a dataset
+    explicit_data_actions = (
+        "analyze the dataset",
+        "analyse the dataset",
+        "analyze the csv",
+        "analyse the csv",
+        "plot the dataset",
+        "plot the csv",
+        "load the csv",
+        "load the dataset",
+        "run code on",
+        "execute code on",
+        "write a script",
+        "python script",
+        "write code",
+    )
+    has_explicit_action = any(phrase in query_lower for phrase in explicit_data_actions)
+
+    # If conceptual AND no explicit data action, skip dataset_manager
+    if is_conceptual and not has_explicit_action:
+        return False
+
+    # Otherwise, use the standard signal check
     has_dataset_signal = any(marker in query_lower for marker in DATASET_REQUEST_MARKERS)
     has_code_signal = any(marker in query_lower for marker in CODE_OR_ANALYSIS_MARKERS)
     return bool(has_dataset_signal and has_code_signal)

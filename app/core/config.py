@@ -33,6 +33,11 @@ class Settings(BaseSettings):
     max_search_results: int = 5
     max_rag_results: int = 5
 
+    # Quality gate (LLM self-evaluation loops)
+    quality_gate_enabled: bool = True
+    quality_gate_min_score: float = 3.0
+    quality_gate_max_retries: int = 2
+
     # Code sandbox
     code_sandbox_dir: str = "./.code_sandbox"
     code_sandbox_timeout: int = 120

@@ -133,6 +133,18 @@ def _should_drop_code_exec(query: str) -> bool:
     query_lower = query.lower()
     conceptual_markers = (
         "what is",
+        "what are",
+        "which",
+        "should i",
+        "should we",
+        "recommend",
+        "suggest",
+        "best",
+        "top",
+        "how does",
+        "how do",
+        "why does",
+        "why do",
         "difference",
         "differences",
         "compare",
@@ -141,6 +153,15 @@ def _should_drop_code_exec(query: str) -> bool:
         "versus",
         "explain",
         "overview",
+        "describe",
+        "impact of",
+        "effect of",
+        "relationship between",
+        "key trends",
+        "factors",
+        "pros and cons",
+        "advantages",
+        "disadvantages",
     )
     numeric_markers = (
         "calculate",
@@ -155,6 +176,12 @@ def _should_drop_code_exec(query: str) -> bool:
         "dataset",
         "csv",
         "table",
+        "load the",
+        "analyze the dataset",
+        "analyse the dataset",
+        "write code",
+        "python script",
+        "execute code",
     )
     return any(marker in query_lower for marker in conceptual_markers) and not any(
         marker in query_lower for marker in numeric_markers
